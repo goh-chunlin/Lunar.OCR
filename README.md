@@ -1,4 +1,4 @@
-# Lunar.Music.Web
+# Lunar.OCR
 
 <div align="center">
     <img src="https://gclstorage.blob.core.windows.net/images/Lunar.OCR-banner.png" />
