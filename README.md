@@ -7,7 +7,8 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Donate](https://img.shields.io/badge/$-donate-ff69b4.svg)](https://www.buymeacoffee.com/chunlin)
 
-This is a project for demonstrating how Tesseract can be used in an UWP app to perform Optical Character Recognition (OCR).
+This is a project for demonstrating how Tesseract can be used in an UWP app to perform Optical Character Recognition (OCR). Currently it 
+supports three languages, i.e. English, Simplified Chinese, and Korean.
 
 ## Key Technologies ##
 1. Windows 10 (Version 1903 - Version 2004)
