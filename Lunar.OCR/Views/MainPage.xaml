@@ -62,8 +62,14 @@
         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
             <Button Content="Upload Image" HorizontalAlignment="Center" Margin="0,6,0,0" Click="ButtonProcessImage_Click"
                     Background="#0274cc" Foreground="White"/>
+
+            <muxc:RadioButtons x:Name="OCRToolSelection" MaxColumns="2" Margin="20,8,0,0">
+                <RadioButton Content="Tesseract" Foreground="White" />
+                <RadioButton Content="Azure" Foreground="White" />
+            </muxc:RadioButtons>
+            
             <muxc:RadioButtons x:Name="LanguageSelection" MaxColumns="3" Margin="20,8,0,0">
-                <RadioButton Content="English" Foreground="White" IsChecked="True" />
+                <RadioButton Content="English" Foreground="White" />
                 <RadioButton Content="Chinese" Foreground="White" />
                 <RadioButton Content="Korean" Foreground="White" />
             </muxc:RadioButtons>

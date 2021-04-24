@@ -17,12 +17,18 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml;
 using Lunar.OCR.Models;
 using System.Text.Json;
+using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
+using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
+using System.Linq;
 
 namespace Lunar.OCR.Views
 {
     public sealed partial class MainPage : Windows.UI.Xaml.Controls.Page
     {
         private readonly List<Thumbnail> _thumbnails = new List<Thumbnail>();
+        // Add your Computer Vision subscription key and endpoint
+        private string azureComputerVisionSubscriptionKey;
+        private string azureComputerVisionEndpoint;
 
         public MainPage()
         {
@@ -32,6 +38,9 @@ namespace Lunar.OCR.Views
             {
                 _thumbnails.Add(new Thumbnail() { ImageURI = $"/Images/{i}.png" });
             }
+
+            OCRToolSelection.SelectedIndex = 0;
+            LanguageSelection.SelectedIndex = 0;
 
             DataContext = this;
         }
@@ -104,6 +113,37 @@ namespace Lunar.OCR.Views
             ImageProgressRing.Visibility = Visibility.Visible;
             ImageHolder.Visibility = Visibility.Collapsed;
 
+            await ShowSelectedImageAsync(imageFile);
+
+            if (OCRToolSelection.SelectedIndex == 1)
+            {
+                if (string.IsNullOrWhiteSpace(azureComputerVisionEndpoint) || string.IsNullOrWhiteSpace(azureComputerVisionSubscriptionKey))
+                {
+                    ContentDialog exceptionDialog = new ContentDialog()
+                    {
+                        Title = "Missing Azure Computer Vision Endpoint and Key",
+                        Content = "Please create a Computer Vision resource in your Azure portal to get your key and endpoint. There is a FREE tier available.",
+                        CloseButtonText = "Ok"
+                    };
+
+                    await exceptionDialog.ShowAsync();
+                }
+                else
+                {
+                    await AnalyseUsingAzureComputerVisionAsync(imageFile);
+                }
+            }
+            else
+            {
+                await AnalyseUsingTesseract(imageFile);
+            }            
+
+            ImageProgressRing.Visibility = Visibility.Collapsed;
+            ImageHolder.Visibility = Visibility.Visible;
+        }
+
+        private async Task AnalyseUsingTesseract(StorageFile imageFile)
+        {
             try
             {
                 byte[] result;
@@ -116,8 +156,6 @@ namespace Lunar.OCR.Views
                     }
                 }
 
-                ImageHolder.Source = await GetBitmapAsync(result);
-
                 string language = "eng";
                 if (LanguageSelection.SelectedIndex == 1) language = "chi_sim";
                 if (LanguageSelection.SelectedIndex == 2) language = "kor";
@@ -128,7 +166,7 @@ namespace Lunar.OCR.Views
                     {
                         using (var page = engine.Process(img))
                         {
-                            var text = "=======================\r\nPLAIN TEXT\r\n=======================\r\n";
+                            string text = "=======================\r\nPLAIN TEXT\r\n=======================\r\n";
 
                             text += page.GetText();
 
@@ -166,20 +204,116 @@ namespace Lunar.OCR.Views
                     }
                 }
             }
+            catch (System.Reflection.TargetInvocationException ex)
+            {
+                await AnalyseUsingAzureComputerVisionAsync(imageFile);
+            }
             catch (Exception ex)
             {
-                ContentDialog exceptionDialog = new ContentDialog()
-                {
-                    Title = "Unexpected Error: " + ex.Message,
-                    Content = ex.ToString(),
-                    CloseButtonText = "Ok"
-                };
-
-                await exceptionDialog.ShowAsync();
+                await ShowExceptionMessageAsync(ex);
             }
+        }
 
-            ImageProgressRing.Visibility = Visibility.Collapsed;
-            ImageHolder.Visibility = Visibility.Visible;
+        private async Task AnalyseUsingAzureComputerVisionAsync(StorageFile imageFile)
+        {
+            try
+            {
+                var computerVisionClient = Authenticate(azureComputerVisionEndpoint, azureComputerVisionSubscriptionKey);
+
+                using (Stream stream = await imageFile.OpenStreamForReadAsync())
+                {
+                    string language = "en";
+                    if (LanguageSelection.SelectedIndex == 1) language = "zh-Hans";
+                    if (LanguageSelection.SelectedIndex == 2) language = "ko";
+                    var textHeaders = await computerVisionClient.ReadInStreamAsync(stream, language);
+
+                    string operationLocation = textHeaders.OperationLocation;
+
+                    // Retrieve the URI where the extracted text will be stored from the Operation-Location header.
+                    // We only need the ID and not the full URL
+                    const int numberOfCharsInOperationId = 36;
+                    string operationId = operationLocation.Substring(operationLocation.Length - numberOfCharsInOperationId);
+
+                    // Extract the text
+                    ReadOperationResult results;
+                    do
+                    {
+                        results = await computerVisionClient.GetReadResultAsync(Guid.Parse(operationId));
+                    }
+                    while ((results.Status == OperationStatusCodes.Running ||
+                        results.Status == OperationStatusCodes.NotStarted));
+
+                    string text = "=======================\r\nPLAIN TEXT\r\n=======================\r\n";
+
+                    var textUrlFileResults = results.AnalyzeResult.ReadResults;
+
+
+                    int wordCount = 0;
+                    double confidenceSum = 0;
+                    foreach (ReadResult page in textUrlFileResults)
+                    {
+                        foreach (Line line in page.Lines)
+                        {
+                            wordCount += line.Words.Count();
+                            confidenceSum += line.Words.Sum(w => w.Confidence);
+                            text += line.Text + "\r\n";
+                        }
+                    }
+
+                    text += "=======================\r\nJSON REPRESENTATION\r\n=======================\r\n";
+
+                    text += JsonSerializer.Serialize(textUrlFileResults);
+
+                    OutputTextTitle.Text = string.Format("Output Text (Average Confidence: {0})", (confidenceSum / wordCount).ToString("0.00"));
+
+                    OutputText.Document.SetText(TextSetOptions.FormatRtf, text);
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowExceptionMessageAsync(ex);
+            }
+        }
+
+        private async Task ShowSelectedImageAsync(StorageFile imageFile)
+        {
+            try
+            {
+                using (Stream stream = await imageFile.OpenStreamForReadAsync())
+                {
+                    byte[] result;
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        stream.CopyTo(memoryStream);
+                        result = memoryStream.ToArray();
+                    }
+                    ImageHolder.Source = await GetBitmapAsync(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowExceptionMessageAsync(ex);
+            }
+        }
+
+        private ComputerVisionClient Authenticate(string endpoint, string key)
+        {
+            ComputerVisionClient client =
+              new ComputerVisionClient(new ApiKeyServiceClientCredentials(key))
+              { Endpoint = endpoint };
+            return client;
+        }
+
+        private async Task ShowExceptionMessageAsync(Exception ex)
+        {
+            ContentDialog exceptionDialog = new ContentDialog()
+            {
+                Title = "Unexpected Error: " + ex.Message,
+                Content = ex.ToString(),
+                CloseButtonText = "Ok"
+            };
+
+            await exceptionDialog.ShowAsync();
         }
     }
 }

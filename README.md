@@ -32,4 +32,4 @@ Together, we learn better.
 
 ## License ##
 
-This library is distributed under the GPL-3.0 License found in the [LICENSE](./LICENSE) file.
+This project is distributed under the GPL-3.0 License found in the [LICENSE](./LICENSE) file.
