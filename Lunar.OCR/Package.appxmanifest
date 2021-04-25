@@ -8,15 +8,15 @@
   IgnorableNamespaces="uap mp genTemplate">
 
   <Identity
-    Name="9E30ECE6-621F-4FF7-99E5-3805F06E330C"
-    Publisher="CN=gclin"
+    Name="4242ChunLin.LunarOCR"
+    Publisher="CN=0E74621A-C59F-4CF0-8FA0-34839E25C541"
     Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="9E30ECE6-621F-4FF7-99E5-3805F06E330C" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="0c95e833-a0e9-4537-a9b1-f86eef95854d" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>Lunar.OCR</DisplayName>
-    <PublisherDisplayName>gclin</PublisherDisplayName>
+    <DisplayName>Lunar OCR</DisplayName>
+    <PublisherDisplayName>ChunLin</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -37,13 +37,13 @@
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
         Description="ms-resource:AppDescription"
-        BackgroundColor="transparent">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
-        <uap:SplashScreen Image="Assets\SplashScreen.png" />
+        BackgroundColor="#FFC000">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png"/>
+        <uap:SplashScreen Image="Assets\SplashScreen.png"  BackgroundColor="#FFC000"/>
+        <uap:InitialRotationPreference>
+          <uap:Rotation Preference="landscape"/>
+          <uap:Rotation Preference="landscapeFlipped"/></uap:InitialRotationPreference>
       </uap:VisualElements>
-
-      <Extensions>
-      </Extensions>
     </Application>
   </Applications>
 
