@@ -10,23 +10,6 @@ Currently, the UWP app available on Microsoft Store works fine with only Azure C
 1. [Azure Computer Vision](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/) (Version 7.0.0)
 1. Hololens 2 Emulator
 
-## Screenshots ##
-<div align="center">
-    <img src="https://gclstorage.blob.core.windows.net/images/Lunar.OCR-screenshot-01.png" />
-</div>
-
-<div align="center">
-    <img src="https://gclstorage.blob.core.windows.net/images/Lunar.OCR-screenshot-02.png" />
-</div>
-
-<div align="center">
-    <img src="https://gclstorage.blob.core.windows.net/images/Lunar.OCR-screenshot-03.png" />
-</div>
-
-<div align="center">
-    <img src="https://gclstorage.blob.core.windows.net/images/Lunar.OCR-screenshot-04.png" />
-</div>
-
 ## Contributing ##
 First and foremost, thank you! I appreciate that you want to contribute to this project which is my personal project. Your time is valuable, and your contributions mean a lot to me. You are welcomed to contribute to this project development and make it more awesome every day.
 
