@@ -1,37 +1,35 @@
-## Welcome to GitHub Pages
+## Lunar OCR
 
-You can use the [editor on GitHub](https://github.com/goh-chunlin/Lunar.OCR/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+This is a project for demonstrating how Tesseract and Azure Computer Vision can be used in an UWP app to perform Optical Character Recognition (OCR). The app now supports three languages, i.e. English, Simplified Chinese, and Korean.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Currently, the UWP app available on Microsoft Store works fine with only Azure Computer Vision on Windows 10 PC and on Hololens 2 (Emulator). Hence, if you would like to try out Tesseract, please download the source code directly from the GitHub and then deploy the UWP app locally.
 
-### Markdown
+## Key Technologies ##
+1. Windows 10 (Version 1903 - Version 2004)
+1. [NuGet - Tesseract](https://www.nuget.org/packages/Tesseract/) (Version 4.1.1)
+1. [Azure Computer Vision](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/) (Version 7.0.0)
+1. Hololens 2 Emulator
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+## Screenshots ##
+<div align="center">
+    <img src="https://gclstorage.blob.core.windows.net/images/Lunar.OCR-screenshot-01.png" />
+</div>
 
-```markdown
-Syntax highlighted code block
+<div align="center">
+    <img src="https://gclstorage.blob.core.windows.net/images/Lunar.OCR-screenshot-02.png" />
+</div>
 
-# Header 1
-## Header 2
-### Header 3
+<div align="center">
+    <img src="https://gclstorage.blob.core.windows.net/images/Lunar.OCR-screenshot-03.png" />
+</div>
 
-- Bulleted
-- List
+<div align="center">
+    <img src="https://gclstorage.blob.core.windows.net/images/Lunar.OCR-screenshot-04.png" />
+</div>
 
-1. Numbered
-2. List
+## Contributing ##
+First and foremost, thank you! I appreciate that you want to contribute to this project which is my personal project. Your time is valuable, and your contributions mean a lot to me. You are welcomed to contribute to this project development and make it more awesome every day.
 
-**Bold** and _Italic_ and `Code` text
+Don't hasitate to contact me, open issue, or even submit a PR if you are intrested to contribute to the project.
 
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/goh-chunlin/Lunar.OCR/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+Together, we learn better.
