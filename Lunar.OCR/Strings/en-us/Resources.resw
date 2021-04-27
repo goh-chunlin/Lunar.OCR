@@ -122,7 +122,7 @@
     <comment>Application display name</comment>
   </data>
   <data name="AppDescription" xml:space="preserve">
-    <value>This is an app to show how we can use Tesseract in UWP.</value>
+    <value>This is an app to show how we can use OCR in UWP.</value>
     <comment>Application description</comment>
   </data>
   <data name="Main_Title.Text" xml:space="preserve">

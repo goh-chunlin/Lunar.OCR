@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Tesseract;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
@@ -15,7 +14,6 @@ using Windows.UI.Text;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml;
-using Lunar.OCR.Models;
 using System.Text.Json;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
@@ -25,10 +23,10 @@ namespace Lunar.OCR.Views
 {
     public sealed partial class MainPage : Windows.UI.Xaml.Controls.Page
     {
+        private bool _isContentDialogOpening;
         private readonly List<Thumbnail> _thumbnails = new List<Thumbnail>();
-        // Add your Computer Vision subscription key and endpoint
-        private string azureComputerVisionSubscriptionKey;
-        private string azureComputerVisionEndpoint;
+        private string _azureComputerVisionSubscriptionKey;
+        private string _azureComputerVisionEndpoint;
 
         public MainPage()
         {
@@ -39,7 +37,6 @@ namespace Lunar.OCR.Views
                 _thumbnails.Add(new Thumbnail() { ImageURI = $"/Images/{i}.png" });
             }
 
-            OCRToolSelection.SelectedIndex = 0;
             LanguageSelection.SelectedIndex = 0;
 
             DataContext = this;
@@ -107,6 +104,11 @@ namespace Lunar.OCR.Views
 
         private async Task AnalysisImageAsync(StorageFile imageFile)
         {
+            if (_isContentDialogOpening)
+            {
+                return;
+            }
+
             WelcomeTextSection.Visibility = Visibility.Collapsed;
             ImageAndTextSection.Visibility = Visibility.Visible;
 
@@ -115,110 +117,37 @@ namespace Lunar.OCR.Views
 
             await ShowSelectedImageAsync(imageFile);
 
-            if (OCRToolSelection.SelectedIndex == 1)
+            if (string.IsNullOrWhiteSpace(_azureComputerVisionEndpoint) || string.IsNullOrWhiteSpace(_azureComputerVisionSubscriptionKey))
             {
-                if (string.IsNullOrWhiteSpace(azureComputerVisionEndpoint) || string.IsNullOrWhiteSpace(azureComputerVisionSubscriptionKey))
-                {
-                    ContentDialog exceptionDialog = new ContentDialog()
-                    {
-                        Title = "Missing Azure Computer Vision Endpoint and Key",
-                        Content = "Please create a Computer Vision resource in your Azure portal to get your key and endpoint. There is a FREE tier available.",
-                        CloseButtonText = "Ok"
-                    };
+                _isContentDialogOpening = true;
 
-                    await exceptionDialog.ShowAsync();
-                }
-                else
+                var azureComputerVisionContentDialog = new AzureComputerVisionContentDialog();
+                var result = await azureComputerVisionContentDialog.ShowAsync();
+                if (result == ContentDialogResult.Primary &&
+                    (!string.IsNullOrWhiteSpace(azureComputerVisionContentDialog.Endpoint) && !string.IsNullOrWhiteSpace(azureComputerVisionContentDialog.Key)))
                 {
+                    _azureComputerVisionEndpoint = azureComputerVisionContentDialog.Endpoint;
+                    _azureComputerVisionSubscriptionKey = azureComputerVisionContentDialog.Key;
+
                     await AnalyseUsingAzureComputerVisionAsync(imageFile);
                 }
+
+                _isContentDialogOpening = false;
             }
             else
             {
-                await AnalyseUsingTesseract(imageFile);
-            }            
+                await AnalyseUsingAzureComputerVisionAsync(imageFile);
+            }
 
             ImageProgressRing.Visibility = Visibility.Collapsed;
             ImageHolder.Visibility = Visibility.Visible;
-        }
-
-        private async Task AnalyseUsingTesseract(StorageFile imageFile)
-        {
-            try
-            {
-                byte[] result;
-                using (Stream stream = await imageFile.OpenStreamForReadAsync())
-                {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        stream.CopyTo(memoryStream);
-                        result = memoryStream.ToArray();
-                    }
-                }
-
-                string language = "eng";
-                if (LanguageSelection.SelectedIndex == 1) language = "chi_sim";
-                if (LanguageSelection.SelectedIndex == 2) language = "kor";
-
-                using (var engine = new TesseractEngine(@"./TrainedData", language, EngineMode.Default))
-                {
-                    using (var img = Pix.LoadFromMemory(result))
-                    {
-                        using (var page = engine.Process(img))
-                        {
-                            string text = "=======================\r\nPLAIN TEXT\r\n=======================\r\n";
-
-                            text += page.GetText();
-
-                            OutputTextTitle.Text = string.Format("Output Text (Mean Confidence: {0})", page.GetMeanConfidence());
-
-                            var recognisedTexts = new List<RecognisedText>();
-
-                            var pgLevel = PageIteratorLevel.Word;
-
-                            using (var iter = page.GetIterator())
-                            {
-                                do
-                                {
-                                    if (iter.TryGetBoundingBox(pgLevel, out Rect boundary))
-                                    {
-                                        var reading = iter.GetText(pgLevel);
-
-                                        recognisedTexts.Add(new RecognisedText
-                                        {
-                                            Text = reading,
-                                            Boundary = boundary
-                                        });
-                                    }
-                                } while (iter.Next(pgLevel));
-                            }
-
-                            text += "=======================\r\nJSON REPRESENTATION\r\n=======================\r\n";
-
-                            text += JsonSerializer.Serialize(recognisedTexts);
-
-                            OutputText.Document.SetText(TextSetOptions.FormatRtf, text);
-
-
-                        }
-                    }
-                }
-            }
-            catch (System.Reflection.TargetInvocationException ex)
-            {
-                await AnalyseUsingAzureComputerVisionAsync(imageFile);
-            }
-            catch (Exception ex)
-            {
-                await ShowExceptionMessageAsync(ex);
-            }
         }
 
         private async Task AnalyseUsingAzureComputerVisionAsync(StorageFile imageFile)
         {
             try
             {
-                var computerVisionClient = Authenticate(azureComputerVisionEndpoint, azureComputerVisionSubscriptionKey);
+                var computerVisionClient = Authenticate(_azureComputerVisionEndpoint, _azureComputerVisionSubscriptionKey);
 
                 using (Stream stream = await imageFile.OpenStreamForReadAsync())
                 {
