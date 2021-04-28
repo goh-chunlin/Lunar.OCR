@@ -14,8 +14,8 @@
     SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
 
     <StackPanel>
-        <TextBlock Text="Please create a Computer Vision resource in your Azure portal to get your endpoint and key. There is a FREE tier available." />
-        
+        <TextBlock Text="Please create a Computer Vision resource in your Azure portal to get your endpoint and key. There is a FREE tier available." TextWrapping="Wrap" />
+        <HyperlinkButton Content="Learn more..." NavigateUri="https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/" />
         <TextBlock Text="Endpoint" Margin="0,4,0,0" />
         <TextBox Text="{Binding ElementName=ContentDialog, Path=Endpoint, Mode=TwoWay}" />
 
