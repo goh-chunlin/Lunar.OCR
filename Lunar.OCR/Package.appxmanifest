@@ -10,7 +10,7 @@
   <Identity
     Name="4242ChunLin.LunarOCR"
     Publisher="CN=0E74621A-C59F-4CF0-8FA0-34839E25C541"
-    Version="1.0.7.0" />
+    Version="1.0.13.0" />
 
   <mp:PhoneIdentity PhoneProductId="0c95e833-a0e9-4537-a9b1-f86eef95854d" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
@@ -44,6 +44,9 @@
           <uap:Rotation Preference="landscape"/>
           <uap:Rotation Preference="landscapeFlipped"/></uap:InitialRotationPreference>
       </uap:VisualElements>
+      <uap:ApplicationContentUriRules>
+        <uap:Rule Type="include" Match="https://adsjumbo.com" WindowsRuntimeAccess="none"/>
+      </uap:ApplicationContentUriRules>
     </Application>
   </Applications>
 

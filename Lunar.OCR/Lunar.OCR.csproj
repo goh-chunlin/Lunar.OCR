@@ -123,6 +123,9 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="AdsJumbo">
+      <Version>5.9.1</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision">
       <Version>7.0.0</Version>
     </PackageReference>

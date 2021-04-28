@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:adsjumbo="using:AdsJumbo"
     Style="{StaticResource PageStyle}"
     mc:Ignorable="d">
     <Grid x:Name="ContentArea" Background="#333333">
@@ -21,6 +22,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="170"/>
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Margin="0,0,2,0">
@@ -37,7 +39,7 @@
                     <Image x:Name="ImageHolder" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="Fill" Margin="0,10,0,0"/>
                 </StackPanel>
 
-                <StackPanel Grid.Column="1" Margin="2,0,0,0">
+                <StackPanel Grid.Column="1" Margin="2,0,2,0">
                     <Frame Background="#1e1e1e" CornerRadius="0" Padding="6,2,6,2">
                         <TextBlock x:Name="OutputTextTitle" Text="Output Text" HorizontalTextAlignment="Left" Foreground="White" FontSize="14"/>
                     </Frame>
@@ -48,6 +50,11 @@
                          IsSpellCheckEnabled="False" IsReadOnly="False" IsColorFontEnabled="True"
                          AutomationProperties.Name="-" Margin="0,10,0,0" />
                 </StackPanel>
+
+                <adsjumbo:BannerAd Grid.Column="2" Margin="2,0,0,0"
+                                   VerticalAlignment="Top" HorizontalAlignment="Center"
+                                   ApplicationId="93wia5ngq5v8"
+                                   WidthAd="160" HeightAd="600" Position="Right" />
             </Grid>
             
         </StackPanel>
